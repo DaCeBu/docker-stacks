@@ -1,0 +1,4 @@
+# Ignoriere Umgebungsvariablen & Secrets
+.env
+config/secrets/
+config/certs/

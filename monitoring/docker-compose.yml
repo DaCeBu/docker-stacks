@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  monitoring:
+    image: replace-with-correct-image
+    container_name: monitoring
+    restart: unless-stopped
+    network_mode: "bridge"
+    volumes:
+      - ./config:/etc/monitoring
+    environment:
+      - TZ=Europe/Berlin

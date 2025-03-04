@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  knx:
+    image: replace-with-correct-image
+    container_name: knx
+    restart: unless-stopped
+    network_mode: "bridge"
+    volumes:
+      - ./config:/etc/knx
+    environment:
+      - TZ=Europe/Berlin

@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  portainer:
+    image: replace-with-correct-image
+    container_name: portainer
+    restart: unless-stopped
+    network_mode: "bridge"
+    volumes:
+      - ./config:/etc/portainer
+    environment:
+      - TZ=Europe/Berlin
