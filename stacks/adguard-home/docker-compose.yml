@@ -1,0 +1,71 @@
+# ------------------------------------------------------
+# | ddddd   eeeee   ccccc   eeeee   bbbbb   u   u |
+# | d   d   e       c       e       b    b  u   u |
+# | d   d   eeee    c       eeee    bbbbb   u   u |
+# | d   d   e       c       e       b    b  u   u |
+# | ddddd   eeeee   ccccc   eeeee   bbbbb   uuuuu |
+# ------------------------------------------------------
+# HomeSmartHome – Docker-Stacks 
+# File: stacks/adguard-home/docker-compose.yml
+# Documentation: https://github.com/DaCeBu/docker-stacks
+# Github Project: https://github.com/DaCeBu/docker-stacks.git
+# Created by: DeCeBu (Data Excellence, Connectivity and Business)
+# ------------------------------------------------------
+
+services:
+  unbound:
+    image: klutchell/unbound
+    container_name: unbound
+    restart: always
+    networks:
+      - qnet-static-eth1   # Verbindung zum externen Netzwerk
+    ports:
+      - "53:53/tcp"        # DNS-Port
+      - "53:53/udp"        # DNS-Port
+    volumes:
+      - ./unbound-data:/etc/unbound
+    environment:
+      - TZ=Europe/Berlin
+    networks:
+      qnet-static-vlan70:
+        ipv4_address: 192.168.70.6  # Statische IP für Unbound
+
+  adguard-home:
+    image: adguard/adguardhome
+    container_name: adguard-home
+    restart: always
+    networks:
+      - qnet-static-eth1   # Verbindung zum externen Netzwerk
+    ports:
+      - "53:53/tcp"     # DNS über TCP
+      - "53:53/udp"     # DNS über UDP
+    #  - "67:67/udp"     # DHCP
+    #  - "68:68/udp"     # DHCP
+      - "80:80/tcp"     # Web-Interface
+      - "443:443/tcp"   # Web-Interface
+      - "443:443/udp"   # Web-Interface
+      - "3000:3000/tcp" # Admin-Web-Interface
+    #  - "853:853/tcp"   # DNS-over-TLS
+    #  - "784:784/udp"   # Weitere UDP-Ports
+    #  - "8853:8853/udp" # Weitere UDP-Ports
+    #  - "5443:5443/tcp" # Weitere TCP-Ports
+    #  - "5443:5443/udp" # Weitere UDP-Ports
+    volumes:
+      - adguard-home-work:/opt/adguardhome/work  # Docker-Volume für Arbeitsdaten
+      - adguard-home-conf:/opt/adguardhome/conf  # Docker-Volume für Konfigurationsdaten
+    environment:
+      - TZ=Europe/Berlin
+    networks:
+      qnet-static-vlan70:
+        ipv4_address: 192.168.70.5  # Statische IP für AdGuard
+
+networks:
+  qnet-static-vlan70:
+    external:
+      name: qnap-static-vlan70  # Das externe Netzwerk, das du bereits erstellt hast
+
+volumes:
+  adguard-home-work:
+    driver: local  # Docker-Volume für Arbeitsdaten
+  adguard-home-conf:
+    driver: local  # Docker-Volume für Konfigurationsdaten

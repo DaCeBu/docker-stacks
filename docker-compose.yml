@@ -6,37 +6,8 @@
 # | ddddd   eeeee   ccccc   eeeee   bbbbb   uuuuu |
 # ------------------------------------------------------
 # HomeSmartHome – Docker-Stacks 
-# File: .gitignore
+# File: docker-compose.yml
 # Documentation: https://github.com/DaCeBu/docker-stacks
 # Github Project: https://github.com/DaCeBu/docker-stacks.git
 # Created by: DeCeBu (Data Excellence, Connectivity and Business)
 # ------------------------------------------------------
-
-# Umgebungsdateien
-.env
-/secrets/
-
-# Konfigurations- und Log-Dateien
-*.log
-*.bak
-*.swp
-*.swo
-
-# Docker-Volumen und persistent gespeicherte Daten
-/docker-compose.override.yml
-/stacks/*/config/
-/stacks/*/.env
-
-# IDE und Editor spezifische Dateien
-.vscode/
-.idea/
-
-# Systemdateien
-.DS_Store
-Thumbs.db
-
-# Portainer spezifische Dateien
-.portainer/
-
-# Docker Container und Images (lokal gespeichert)
-docker-compose.yml.override
