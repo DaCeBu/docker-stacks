@@ -72,7 +72,7 @@ volumes:
       device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/adguard_data
       o: bind
 
-  adguard-config:
+  adguard-conf:
     driver: local
     driver_opts:
       type: none
