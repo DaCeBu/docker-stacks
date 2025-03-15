@@ -61,7 +61,7 @@ services:
 
 networks:
   qnet-static-vlan70:
-    name: qnap-static-vlan70  # Das externe Netzwerk, das du bereits erstellt hast
+    name: qnet-static-vlan70  # Das externe Netzwerk, das du bereits erstellt hast
     external: true
 
 volumes:
