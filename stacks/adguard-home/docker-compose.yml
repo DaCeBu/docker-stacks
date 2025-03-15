@@ -16,14 +16,14 @@ services:
   unbound:
     image: klutchell/unbound
     container_name: unbound
-    restart: always
+    restart: unless-stopped
     networks:
       - qnet-static-eth1   # Verbindung zum externen Netzwerk
     ports:
       - "53:53/tcp"        # DNS-Port
       - "53:53/udp"        # DNS-Port
     volumes:
-      - unbound-data:/opt/unbound/etc/unbound/
+      - unbound-data:/etc/unbound/custom.conf.d
     environment:
       - TZ=Europe/Berlin
     networks:
