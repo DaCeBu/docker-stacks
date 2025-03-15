@@ -61,15 +61,15 @@ services:
 
 networks:
   qnet-static-vlan70:
-    external:
-      name: qnap-static-vlan70  # Das externe Netzwerk, das du bereits erstellt hast
+		name: qnap-static-vlan70  # Das externe Netzwerk, das du bereits erstellt hast
+		external: true
 
 volumes:
   adguard-data:
     driver: local
     driver_opts:
       type: none
-      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/adguard_data
+        device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/adguard_data
       o: bind
 
   adguard-config:
