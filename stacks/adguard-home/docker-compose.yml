@@ -23,7 +23,7 @@ services:
       - "53:53/tcp"        # DNS-Port
       - "53:53/udp"        # DNS-Port
     volumes:
-      - ./unbound-data:/etc/unbound
+      - unbound-data:/opt/unbound/etc/unbound/
     environment:
       - TZ=Europe/Berlin
     networks:
@@ -51,8 +51,8 @@ services:
     #  - "5443:5443/tcp" # Weitere TCP-Ports
     #  - "5443:5443/udp" # Weitere UDP-Ports
     volumes:
-      - adguard-home-work:/opt/adguardhome/work  # Docker-Volume für Arbeitsdaten
-      - adguard-home-conf:/opt/adguardhome/conf  # Docker-Volume für Konfigurationsdaten
+      - adguard-data:/opt/adguardhome/work  # Docker-Volume für Arbeitsdaten
+      - adguard-conf:/opt/adguardhome/conf  # Docker-Volume für Konfigurationsdaten
     environment:
       - TZ=Europe/Berlin
     networks:
@@ -65,7 +65,23 @@ networks:
       name: qnap-static-vlan70  # Das externe Netzwerk, das du bereits erstellt hast
 
 volumes:
-  adguard-home-work:
-    driver: local  # Docker-Volume für Arbeitsdaten
-  adguard-home-conf:
-    driver: local  # Docker-Volume für Konfigurationsdaten
+  adguard-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/adguard_data
+      o: bind
+
+  adguard-config:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/adguard_conf
+      o: bind
+
+  unbound-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/unbound_data
+      o: bind
