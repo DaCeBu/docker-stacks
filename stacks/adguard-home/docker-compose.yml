@@ -17,6 +17,13 @@ services:
     image: klutchell/unbound
     container_name: unbound
     restart: unless-stopped
+    healthcheck:
+      # Use the drill wrapper binary to reduce the exit codes to 0 or 1 for healthchecks
+      test: ['CMD', 'drill-hc', '@127.0.0.1', 'dnssec.works']
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
     ports:
       - "53:53/tcp"        # DNS-Port
       - "53:53/udp"        # DNS-Port
@@ -27,6 +34,8 @@ services:
     networks:
       qnet-static-vlan70:
         ipv4_address: 192.168.70.6  # Statische IP für Unbound
+    depends_on:
+      - redis
 
   adguard-home:
     image: adguard/adguardhome
@@ -54,11 +63,30 @@ services:
     networks:
       qnet-static-vlan70:
         ipv4_address: 192.168.70.5  # Statische IP für AdGuard
+      unbound-network:
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: "[ $$(redis-cli ping) = 'PONG' ]"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+    networks:
+      - unbound-network  # Redis ist nur im internen Netzwerk sichtbar
 
 networks:
   qnet-static-vlan70:
     name: qnet-static-vlan70  # Das externe Netzwerk, das du bereits erstellt hast
     external: true
+  unbound-network:
+    driver: bridge
 
 volumes:
   adguard-data:
@@ -80,4 +108,11 @@ volumes:
     driver_opts:
       type: none
       device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/unbound_data
+      o: bind
+  
+  redis-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/redis_data
       o: bind
