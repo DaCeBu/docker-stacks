@@ -89,4 +89,3 @@ Im **`AdGuardHome.yaml`**-Konfigurationsdatei kannst du wichtige Parameter wie D
 ## Lizenz
 
 Dieses Projekt ist unter der [MIT-Lizenz](LICENSE) lizenziert.
-

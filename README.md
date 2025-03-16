@@ -49,7 +49,107 @@ Die **ENV-Variablen** für jeden Stack können in den `.env`-Dateien innerhalb d
 
 Stelle sicher, dass du die `.env`-Dateien nach deinen Bedürfnissen anpasst und die entsprechenden Secrets für jeden Stack einrichtest.
 
-## 📂 Verzeichnisstruktur
+## 🛠️ **Externe Volumes für Docker-Stacks**
+
+In diesem Repository verwenden wir **externe Volumes**, um sicherzustellen, dass Daten persistiert und über Container-Neustarts hinweg erhalten bleiben. Jedes Volume wird in der **`docker-compose.yml`**-Datei innerhalb der jeweiligen Stack-Ordner konfiguriert und verweist auf ein **externes Volume** oder ein **Bind-Mount**, das auf einem bestimmten Verzeichnis auf deinem Host-Computer gespeichert ist.
+
+### **Wie man Volumes extern anlegt:**
+
+1. **Erstellen von externen Volumes:**
+   
+   Bevor du Docker-Stacks wie AdGuard Home, Unbound oder InfluxDB startest, musst du sicherstellen, dass die Volumes, die in der `docker-compose.yml`-Datei referenziert werden, **extern angelegt** sind.
+
+   Du kannst ein externes Volume mit folgendem Befehl erstellen:
+   
+   ```bash
+   docker volume create --name <volume_name>
+   ```
+
+   Beispiel für ein externes Volume:
+   
+   ```bash
+   docker volume create --name adguard-data
+   docker volume create --name unbound-data
+   docker volume create --name influxdb-data
+   ```
+
+2. **Konfiguration der Volumes in der `docker-compose.yml`:**
+
+   In der `docker-compose.yml`-Datei musst du sicherstellen, dass das Volume als **extern** referenziert wird. Hier ist ein Beispiel, wie du dies für den AdGuard- und Unbound-Stack tun kannst:
+
+   ```yaml
+   version: '3.7'
+
+   services:
+     adguard:
+       image: adguard/adguardhome
+       container_name: adguard
+       volumes:
+         - adguard-data:/opt/adguardhome/work
+         - adguard-config:/opt/adguardhome/conf
+       ports:
+         - "53:53/tcp"
+         - "53:53/udp"
+       restart: unless-stopped
+
+     unbound:
+       image: mvance/unbound
+       container_name: unbound
+       volumes:
+         - unbound-data:/var/lib/unbound
+         - unbound-config:/etc/unbound
+       ports:
+         - "53:53/tcp"
+         - "53:53/udp"
+       restart: unless-stopped
+
+   volumes:
+     adguard-data:
+       external: true
+     adguard-config:
+       external: true
+     unbound-data:
+       external: true
+     unbound-config:
+       external: true
+   ```
+
+   - **`external: true`**: Diese Option stellt sicher, dass Docker Compose **die Volumes nicht selbst erstellt**, sondern stattdessen auf die bereits extern erstellten Volumes verweist.
+   - Die Namen der Volumes (wie **`adguard-data`** und **`unbound-data`**) müssen mit den Volumes übereinstimmen, die mit **`docker volume create`** erstellt wurden.
+
+3. **Verwendung von Bind-Mounts (optional):**
+   
+   Falls du Volumes **nicht als Docker-Volumes**, sondern als **Bind-Mounts** (z.B. Ordner auf deinem Host-Computer) nutzen möchtest, kannst du diese wie folgt in der `docker-compose.yml` definieren:
+
+   ```yaml
+   volumes:
+     adguard-data:
+       driver: local
+       driver_opts:
+         type: none
+         device: /path/to/host/directory/adguard-data
+         o: bind
+     unbound-data:
+       driver: local
+       driver_opts:
+         type: none
+         device: /path/to/host/directory/unbound-data
+         o: bind
+   ```
+
+   Hierbei solltest du sicherstellen, dass der Pfad auf deinem Host-Computer korrekt ist und die **Benutzerrechte** stimmen, sodass der Container auf das Verzeichnis zugreifen kann.
+
+### **Fazit:**
+
+- **Externe Volumes** sollten immer vorher mit `docker volume create` erstellt werden, um die Persistenz der Daten über Container-Neustarts hinweg sicherzustellen.
+- In der `docker-compose.yml`-Datei werden Volumes als **extern** deklariert, um Docker Compose anzuweisen, bereits bestehende Volumes zu verwenden.
+- Wenn du Volumes direkt auf deinem Host speichern möchtest, kannst du **Bind-Mounts** verwenden und die entsprechenden Verzeichnisse in der `docker-compose.yml` angeben.
+
+Diese Methode stellt sicher, dass die Daten deines Docker-Stacks nicht verloren gehen, wenn der Container gestoppt oder neu gestartet wird, und dass sie leicht verwaltet und gesichert werden können.
+  
+---
+
+### 📂 Verzeichnisstruktur
 
 Die Struktur des Repositories ist so aufgebaut, dass jeder Stack (Docker-Container) seine eigene Konfiguration und Docker-Compose-Datei hat. Dadurch kannst du jeden Stack unabhängig von den anderen starten und verwalten. Die wichtigsten Ordner und Dateien im Root-Verzeichnis sind:
 

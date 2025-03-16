@@ -17,8 +17,6 @@ services:
     image: klutchell/unbound
     container_name: unbound
     restart: unless-stopped
-    networks:
-      - qnet-static-eth1   # Verbindung zum externen Netzwerk
     ports:
       - "53:53/tcp"        # DNS-Port
       - "53:53/udp"        # DNS-Port
@@ -34,8 +32,6 @@ services:
     image: adguard/adguardhome
     container_name: adguard-home
     restart: always
-    networks:
-      - qnet-static-eth1   # Verbindung zum externen Netzwerk
     ports:
       - "53:53/tcp"     # DNS über TCP
       - "53:53/udp"     # DNS über UDP
