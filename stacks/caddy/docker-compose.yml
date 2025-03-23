@@ -1,0 +1,63 @@
+# ------------------------------------------------------
+# | ddddd   eeeee   ccccc   eeeee   bbbbb   u   u |
+# | d   d   e       c       e       b    b  u   u |
+# | d   d   eeee    c       eeee    bbbbb   u   u |
+# | d   d   e       c       e       b    b  u   u |
+# | ddddd   eeeee   ccccc   eeeee   bbbbb   uuuuu |
+# ------------------------------------------------------
+# HomeSmartHome – Docker-Stacks 
+# File: stacks/caddy/docker-compose.yml
+# Documentation: https://github.com/DaCeBu/docker-stacks
+# Github Project: https://github.com/DaCeBu/docker-stacks.git
+# Created by: DeCeBu (Data Excellence, Connectivity and Business)
+# ------------------------------------------------------
+
+services:
+
+  caddy:
+    build: ./dockerfile-dns
+    container_name: caddy
+    hostname: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    networks:
+      qnet-static-vlan30:
+        ipv4_address: 192.168.30.4  # Statische IP für AdGuard
+    env_file:
+      - ../../caddy_secrets.env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-conf:/config
+
+  whoami:
+    image: "containous/whoami"
+    container_name: "whoami"
+    hostname: "whoami"
+    networks:
+      - qnet-static-vlan30
+
+networks:
+
+  networks:
+  qnet-static-vlan30:
+    name: qnet-static-vlan30  # Das externe Netzwerk, das du bereits erstellt hast
+    external: true
+
+volumes:
+  caddy-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/caddy_data
+      o: bind
+
+  caddy-conf:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/caddy_conf
+      o: bind
