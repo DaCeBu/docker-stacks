@@ -15,8 +15,6 @@
 # Umgebungsdateien
 .env
 /secrets/
-!secrets/sync_env_from_backup.sh
-!secrets/sync_env_to_backup.sh
 
 # Konfigurations- und Log-Dateien
 *.log
