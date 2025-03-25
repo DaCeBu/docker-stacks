@@ -26,6 +26,7 @@ services:
     networks:
       qnet-static-vlan30:
         ipv4_address: 192.168.30.4  # Statische IP für AdGuard
+      caddynet:
     env_file:
       - ../../secrets/caddy_secrets.env
     volumes:
@@ -38,7 +39,7 @@ services:
     container_name: "whoami"
     hostname: "whoami"
     networks:
-      - qnet-static-vlan30
+      - caddynet
 
 networks:
 
@@ -46,6 +47,15 @@ networks:
   qnet-static-vlan30:
     name: qnet-static-vlan30  # Das externe Netzwerk, das du bereits erstellt hast
     external: true
+  caddynet:
+    attachable: true
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: docker_caddy
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/16
 
 volumes:
   caddy-data:
