@@ -24,7 +24,7 @@ Um den Unbound-Stack zu starten, verwende Docker Compose. Stelle sicher, dass du
 2. Bearbeite die Konfigurationsdateien, falls nötig (z.B. `unbound.conf`), und stelle sicher, dass die Volumes korrekt gemountet sind.
 3. Führe den folgenden Befehl aus, um den Stack zu starten:
 
-```
+```bash
 docker-compose up -d
 ```
 
@@ -34,7 +34,7 @@ Unbound hört auf Port **53** (Standardport für DNS), sodass du den DNS-Server 
 
 Beispiel, um von einem anderen System im Netzwerk auf Unbound zuzugreifen:
 
-```
+```bash
 dig @192.168.70.6 google.com
 ```
 
@@ -47,7 +47,7 @@ dig @192.168.70.6 google.com
 
 Die Volumes für die Konfiguration und Arbeitsdaten von Unbound sind in der **`docker-compose.yml`**-Datei definiert:
 
-```
+```yaml
 volumes:
   unbound-data:
     driver: local
@@ -68,7 +68,7 @@ Die Volumes stellen sicher, dass deine **Konfigurationsdaten** und **Arbeitsdate
 
 Die **`root.hints`**-Datei enthält die IP-Adressen der Root-Nameserver und ist notwendig, damit Unbound DNS-Abfragen rekursiv auflösen kann. Du kannst die **`root.hints`**-Datei automatisch herunterladen, indem du einen Cron-Job erstellst oder den folgenden Befehl manuell ausführst:
 
-```
+```bash
 wget https://www.internic.net/domain/named.root -O /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/unbound_data/root.hints
 ```
 
@@ -78,7 +78,7 @@ Die Datei wird dann in deinem Docker-Volume für Unbound gespeichert.
 
 Um die DNSSEC-Sicherheit zu aktivieren, musst du den **root.key** Trust Anchor herunterladen. Dies wird mit dem folgenden Befehl im Unbound-Container erledigt:
 
-```
+```bash
 docker exec unbound unbound-anchor -a /opt/unbound/etc/unbound/root.key
 ```
 
@@ -88,25 +88,48 @@ Dieser Befehl lädt die neuesten DNSSEC-Zertifikate und speichert sie in der **`
 
 Stelle sicher, dass deine **`unbound.conf`**-Datei auf die **`root.hints`**- und **`root.key`**-Dateien verweist:
 
-```
+```bash
 server:
   root-hints: "/etc/unbound/custom.conf.d/root.hints"
   auto-trust-anchor-file: "/etc/unbound/custom.conf.d/root.key"
 ```
 
-### 4. **Testen von Unbound**
+### 4. **Konfiguration der Unbound-Dateien in `templates/`**
+
+Im **`templates/`**-Ordner des Repositories findest du die folgenden wichtigen Konfigurationsdateien, die ins Unbound-Volume abgelegt werden müssen:
+
+- **`unbound.conf`**: Dies ist die Hauptkonfigurationsdatei für Unbound, in der du grundlegende Servereinstellungen wie DNSSEC und Forwarding konfigurieren kannst.
+- **`a-records.conf`**: Diese Datei enthält alle lokalen DNS-Daten wie A-Records für interne Geräte in deinem Netzwerk. Zum Beispiel:
+
+```bash
+local-data: "ha.home.decebu.com. IN A 192.168.50.2"
+local-data: "media.home.decebu.com. IN A 192.168.40.5"
+```
+
+- **`forward-records.conf`**: Diese Datei enthält die DNS-Forwarding-Einstellungen. Hier kannst du die DNS-Server angeben, an die Unbound DNS-Anfragen weiterleiten soll, wenn sie nicht lokal beantwortet werden können. Zum Beispiel:
+
+```bash
+forward-zone:
+  name: "."
+  forward-addr: 1.1.1.1@853  # Cloudflare DNS (DNS-over-TLS)
+  forward-addr: 8.8.8.8@853  # Google DNS (DNS-over-TLS)
+```
+
+Diese Dateien müssen in das Unbound-Volume eingebunden werden, um sicherzustellen, dass Unbound beim Start die richtigen Konfigurationen lädt.
+
+### 5. **Testen von Unbound**
 
 Verwende den **`dig`**-Befehl, um sicherzustellen, dass Unbound korrekt funktioniert:
 
-```
+```bash
 dig @192.168.70.6 google.com
 ```
 
 Wenn Unbound richtig arbeitet, solltest du die **IP-Adresse von google.com** als Antwort erhalten.
 
-### 5. **Fehlerbehebung**
+### 6. **Fehlerbehebung**
 
-- **Container startet nicht**: Stelle sicher, dass Docker und Docker Compose korrekt installiert und konfiguriert sind. Überprüfe die Logs mit `docker-compose logs`.
+- **Container startet nicht**: Stelle sicher, dass Docker und Docker Compose korrekt installiert sind. Überprüfe die Logs mit `docker-compose logs`.
 - **Web-Oberfläche nicht erreichbar**: Prüfe, ob die richtigen Ports (z.B. 80, 443) weitergeleitet wurden und ob keine anderen Anwendungen diese Ports verwenden.
 
 ## Lizenz
