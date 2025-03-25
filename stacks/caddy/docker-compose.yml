@@ -42,8 +42,6 @@ services:
       - caddynet
 
 networks:
-
-  networks:
   qnet-static-vlan30:
     name: qnet-static-vlan30  # Das externe Netzwerk, das du bereits erstellt hast
     external: true
