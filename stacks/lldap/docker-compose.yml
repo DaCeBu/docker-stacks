@@ -1,0 +1,50 @@
+# ------------------------------------------------------
+# | ddddd   eeeee   ccccc   eeeee   bbbbb   u   u |
+# | d   d   e       c       e       b    b  u   u |
+# | d   d   eeee    c       eeee    bbbbb   u   u |
+# | d   d   e       c       e       b    b  u   u |
+# | ddddd   eeeee   ccccc   eeeee   bbbbb   uuuuu |
+# ------------------------------------------------------
+# HomeSmartHome – Docker-Stacks 
+# File: stacks/lldap/docker-compose.yml
+# Documentation: https://github.com/DaCeBu/docker-stacks
+# Github Project: https://github.com/DaCeBu/docker-stacks.git
+# Created by: DeCeBu (Data Excellence, Connectivity and Business)
+# ------------------------------------------------------
+
+services:
+
+  lldap:
+    container_name: lldap
+    hostname: lldap
+    image: lldap/lldap:stable
+    restart: unless-stopped
+    networks:
+      - caddy_caddynet
+    expose:
+      - 3890   # LDAP
+      - 17170  # Web UI
+    env_file:
+      - lldap_secrets.env
+    volumes:
+      - lldap-data:/data
+      - lldap-secrets:/secrets
+
+networks:
+  caddy_caddynet:
+    external: true
+
+volumes:
+  lldap-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/lldap_data
+      o: bind
+
+  lldap-secrets:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/lldap_secrets
+      o: bind
