@@ -19,3 +19,10 @@ whoami.{$MY_DOMAIN} {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
 }
+
+lldap.{$MY_DOMAIN} {
+	reverse_proxy lldap:17170
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
