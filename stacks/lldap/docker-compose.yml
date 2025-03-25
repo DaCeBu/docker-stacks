@@ -30,7 +30,7 @@ services:
       - lldap-data:/data
       - lldap-secrets:/secrets
 
-redis:
+  redis:
     container_name: redis
     hostname: redis
     image: redis:latest
