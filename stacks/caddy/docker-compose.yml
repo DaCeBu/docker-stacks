@@ -27,7 +27,7 @@ services:
       qnet-static-vlan30:
         ipv4_address: 192.168.30.4  # Statische IP für AdGuard
     env_file:
-      - ../../caddy_secrets.env
+      - ../../secrets/caddy_secrets.env
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
