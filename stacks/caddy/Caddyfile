@@ -12,8 +12,23 @@
 # Created by: DeCeBu (Data Excellence, Connectivity and Business)
 # ------------------------------------------------------
 
+#
+# Forward authentication with optional matcher
+#
+# The snippet can optionally be imported with arguments that are passed to a matcher, e.g.:
+# 
+#    import auth not remote_ip 192.168.10.0/24
+#
+(auth) {
+	@Matcher {args[:]}
+	forward_auth @Matcher authelia:9091 {
+		uri /api/authz/forward-auth
+		copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+	}
+}
 
 whoami.{$MY_DOMAIN} {
+	import auth
 	reverse_proxy whoami:80
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
@@ -22,6 +37,13 @@ whoami.{$MY_DOMAIN} {
 
 lldap.{$MY_DOMAIN} {
 	reverse_proxy lldap:17170
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
+
+auth.{$MY_DOMAIN} {
+	reverse_proxy authelia:9091
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
