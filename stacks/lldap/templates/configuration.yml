@@ -1,0 +1,69 @@
+---
+theme: auto
+default_2fa_method: totp
+server:
+  address: tcp://0.0.0.0:9091/
+  endpoints:
+    authz:
+      forward-auth:
+        implementation: 'ForwardAuth'
+log:
+  level: info
+totp:
+  disable: false
+  algorithm: sha1
+  digits: 6
+  period: 30
+  skew: 1
+  secret_size: 32
+webauthn:
+  disable: false
+  timeout: 60s
+  attestation_conveyance_preference: indirect
+  user_verification: preferred
+authentication_backend:
+  password_reset:
+    disable: false
+  refresh_interval: 5m
+  ldap:
+    implementation: custom
+    timeout: 5s
+    start_tls: false
+    attributes:
+      username: uid
+      display_name: displayName
+      group_name: cn
+      mail: mail
+    additional_users_dn: ou=people
+    users_filter: "(&({username_attribute}={input})(objectClass=person))"
+    additional_groups_dn: ou=groups
+    groups_filter: "(member={dn})"
+password_policy:
+  standard:
+    enabled: false
+    min_length: 8
+    max_length: 0
+    require_uppercase: true
+    require_lowercase: true
+    require_number: true
+    require_special: false
+access_control:
+  default_policy: two_factor
+session:
+  name: authelia_session
+  cookies:
+    - domain: '{{ env "COOKIE_SESSION_DOMAIN" }}'
+      authelia_url: 'https://auth.{{ env "COOKIE_SESSION_DOMAIN" }}'
+  redis:
+    host: redis
+    port: 6379
+regulation:
+  max_retries: 3
+  find_time: 2m
+  ban_time: 5m
+storage:
+  local:
+    path: /config/db.sqlite3
+notifier:
+  disable_startup_check: false
+...

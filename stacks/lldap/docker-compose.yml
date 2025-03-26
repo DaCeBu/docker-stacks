@@ -42,6 +42,21 @@ services:
     volumes:
       - redis-data:/data
 
+  authelia:
+    container_name: authelia
+    hostname: authelia
+    image: authelia/authelia:4
+    restart: unless-stopped
+    networks:
+      - caddy_caddynet
+    expose:
+      - 9091
+    env_file:
+      - authelia_secrets.env
+    volumes:
+      - authelia-conf:/config
+      - authelia-secrets:/secrets
+
 networks:
   caddy_caddynet:
     external: true
@@ -66,4 +81,18 @@ volumes:
     driver_opts:
       type: none
       device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/redis_data
+      o: bind
+
+  authelia-conf:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/authelia_conf
+      o: bind
+
+  authelia-secrets:
+    driver: local
+    driver_opts:
+      type: none
+      device: /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/authelia_secrets
       o: bind
