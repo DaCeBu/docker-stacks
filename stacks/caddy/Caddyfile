@@ -48,3 +48,10 @@ auth.{$MY_DOMAIN} {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
 }
+
+udm.{$MY_DOMAIN} {
+	reverse_proxy 192.168.10.1:80
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
