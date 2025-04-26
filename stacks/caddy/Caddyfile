@@ -55,3 +55,12 @@ udm.{$MY_DOMAIN} {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
 }
+
+victoriametrics.{$MY_DOMAIN} {
+	# Don't require authentication from the subnet Home Assistant is on (unauthenticated ingest)
+	import auth not remote_ip 192.168.50.0/24
+	reverse_proxy victoriametrics:8428
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
