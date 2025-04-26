@@ -1,0 +1,34 @@
+# ------------------------------------------------------
+# | ddddd   eeeee   ccccc   eeeee   bbbbb   u   u |
+# | d   d   e       c       e       b    b  u   u |
+# | d   d   eeee    c       eeee    bbbbb   u   u |
+# | d   d   e       c       e       b    b  u   u |
+# | ddddd   eeeee   ccccc   eeeee   bbbbb   uuuuu |
+# ------------------------------------------------------
+# HomeSmartHome – Docker-Stacks 
+# File: stacks/victoriametrics/docker-compose.yml
+# Documentation: https://github.com/DaCeBu/docker-stacks
+# Github Project: https://github.com/DaCeBu/docker-stacks.git
+# Created by: DeCeBu (Data Excellence, Connectivity and Business)
+# ------------------------------------------------------
+
+services:
+
+  victoriametrics:
+    container_name: victoriametrics
+    hostname: victoriametrics
+    image: victoriametrics/victoria-metrics
+    restart: unless-stopped
+    networks:
+      - caddy_caddynet     # frontend communications
+    ports:
+      - 8428:8428          # web UI and data ingestion (HTTP)
+    command:
+      - "--retentionPeriod=100y"   # store data "indefinitely"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /share/CE_CACHEDEV1_DATA/Docker_DATA/volumes/victoriametrics_data:/victoria-metrics-data
+
+networks:
+  caddy_caddynet:
+    external: true
