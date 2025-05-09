@@ -33,6 +33,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-conf:/config
+    entrypoint: ["/start.sh"]
 
   whoami:
     image: "containous/whoami"
